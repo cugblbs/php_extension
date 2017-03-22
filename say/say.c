@@ -49,6 +49,29 @@ PHP_FUNCTION(say) {
 	RETURN_STR(strg);
 }
 
+PHP_FUNCTION(get_size) {
+	
+	zval *val;
+	size_t size;
+	zend_string *result;
+	HashTable *myht;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS(), "z", &val) == FAILURE) {
+		return;
+	}
+
+	if(Z_TYPE_P(val) == IS_STRING) {
+		result = strpprintf(0, "sting size is %d", Z_STRLEN_P(val));
+	}else if(Z_TYPE_P(val) == IS_ARRAY) {
+		myht = Z_ARRVAL_P(val);
+		result = strpprintf(0, "array size is %d", zend_array_count(myht));
+	}else {
+		result = strpprintf(0, "can not support!");
+	}
+
+	RETURN_STR(result);
+}
+
 PHP_FUNCTION(default_value) {
 	zend_string *type;
 	zval        *value = NULL;
@@ -181,6 +204,7 @@ PHP_MINFO_FUNCTION(say)
  * Every user visible function must have an entry in say_functions[].
  */
 const zend_function_entry say_functions[] = {
+	PHP_FE(get_size, NULL)
 	PHP_FE(default_value, NULL)
 	PHP_FE(say,NULL)
 	PHP_FE(confirm_say_compiled,	NULL)		/* For testing, remove later. */
