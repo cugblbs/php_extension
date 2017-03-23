@@ -49,6 +49,24 @@ PHP_FUNCTION(say) {
 	RETURN_STR(strg);
 }
 
+PHP_FUNCTION(str_concat) {
+
+	zend_string *prefix, *subject, *result;
+	zval *string;
+
+	if(zend_parse_parameters(ZEND_NUM_ARGS(), "Sz", &prefix, &string) == FAILURE) {
+		return;
+	}
+
+	subject = zval_get_string(string);
+	if(zend_binary_strncmp(ZSTR_VAL(prefix), ZSTR_LEN(prefix), ZSTR_VAL(subject), ZSTR_LEN(subject), ZSTR_LEN(prefix)) == 0) {
+		RETURN_STR(subject);
+	}
+	result = strpprintf(0, "%s %s", ZSTR_VAL(prefix), ZSTR_VAL(subject));
+	RETURN_STR(result);
+
+}
+
 PHP_FUNCTION(get_size) {
 	
 	zval *val;
@@ -204,6 +222,7 @@ PHP_MINFO_FUNCTION(say)
  * Every user visible function must have an entry in say_functions[].
  */
 const zend_function_entry say_functions[] = {
+	PHP_FE(str_concat, NULL)
 	PHP_FE(get_size, NULL)
 	PHP_FE(default_value, NULL)
 	PHP_FE(say,NULL)
